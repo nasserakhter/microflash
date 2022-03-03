@@ -33,7 +33,7 @@ export async function init(update) {
     } else {
         console.log("Updating esptool");
         console.log("[ github ] get latest release at espressif/esptool");
-        let json = await axios.get("https://api.github.com/repos/espressif/esptool/releases");
+        let json = await axios.get(global.appConfig.esptool_github_releases_manifest);
         let latest = json[0];
         let latest_asset = latest.assets.find(x => x.name.includes(os));
         console.log("[ github ] latest release: " + latest.tag_name);

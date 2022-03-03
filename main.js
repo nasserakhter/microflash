@@ -3,7 +3,9 @@ import { init } from './src/downloadesptool.js';
 import { SerialPort } from 'serialport';
 import { getLatestVersion, downloadVersion } from './src/espruinotool.js';
 import { spawn } from 'child_process';
+import { getAppConfiguration, changeSetting } from './src/appconfig.js';
 
+await getAppConfiguration();
 
 console.clear();
 let logo = `  __  __ _____ _____ _____   ____  ______ _                _____ _    _ 
@@ -32,18 +34,42 @@ let menu = await inquirer.prompt([
                 name: "Update esptool",
                 value: 1
             },
+            {
+                name: "Modify the config file",
+                value: 2
+            },
             new inquirer.Separator(),
             {
                 name: "Exit",
-                value: 2
+                value: 3
             }
         ]
     }
 ]);
 
-if (menu.option === 2) process.exit(0);
+if (menu.option === 3) process.exit(0);
 if (menu.option === 1) {
     await init();
+    process.exit(0);
+}
+
+if (menu.option === 2) {
+    let config = await inquirer.prompt([
+        {
+            type: "input",
+            name: "espruino_binaries_apache_index",
+            message: "Enter the url of espruino binaries apache index:",
+            default: global.appConfig.espruino_binaries_apache_index
+        },
+        {
+            type: "input",
+            name: "esptool_github_releases_manifest",
+            message: "Enter the url of esptool github releases manifest:",
+            default: global.appConfig.esptool_github_releases_manifest
+        }
+    ]);
+    await changeSetting("espruino_binaries_apache_index", config.espruino_binaries_apache_index);
+    await changeSetting("esptool_github_releases_manifest", config.esptool_github_releases_manifest);
     process.exit(0);
 }
 
