@@ -4,6 +4,7 @@ import { SerialPort } from 'serialport';
 import { getLatestVersion, downloadVersion } from './src/espruinotool.js';
 import { spawn } from 'child_process';
 
+
 console.clear();
 let logo = `  __  __ _____ _____ _____   ____  ______ _                _____ _    _ 
 |  \\/  |_   _/ ____|  __ \\ / __ \\|  ____| |        /\\    / ____| |  | |
@@ -13,10 +14,10 @@ let logo = `  __  __ _____ _____ _____   ____  ______ _                _____ _  
 |_|  |_|_____\\_____|_|  \\_\\\\____/|_|    |______/_/    \\_|_____/|_|  |_|`;
 console.log(logo + "\n");
 console.log("MicroFlash by Microart, Copyright (c) " + new Date().getFullYear() + " Microart Inc. All rights reserved.\n\n");
-console.log("Welcome to MicroFlash!");
 
 await init();
 
+console.log("\nWelcome to MicroFlash!");
 let menu = await inquirer.prompt([
     {
         type: "list",
@@ -85,9 +86,8 @@ let baud = await inquirer.prompt([
     }
 ]);
 
-flashConfig.baudrate = baud.rate;
+flashConfig.baudrate = parseInt(baud.rate);
 
-console.log("Finding latest espruino version...");
 let versions = await getLatestVersion();
 let version = await inquirer.prompt([
     {
@@ -111,14 +111,15 @@ flashConfig.version = selectedVersion;
 let confirmFlash = await inquirer.prompt({
     type: "confirm",
     name: "confirm",
-    message: `Are you sure you want to flash  to " + selectedport.path + " at ${baud.rate} baud?`
+    message: `Are you sure you want to flash Espruino ${flashConfig.version.split("_")[1]} to ${flashConfig.port.path} at ${flashConfig.baudrate} baud?
+This will erase all existing data on the device.`
 });
 
 if (confirmFlash.confirm) {
     console.log("Flashing espruino...");
     let binary = await downloadVersion(selectedVersion);
     let args = [
-        "--port", flashConfig.port,
+        "--port", flashConfig.port.path,
         "--baud", flashConfig.baudrate,
         "write_flash",
         "-fm", "dio",
@@ -128,9 +129,13 @@ if (confirmFlash.confirm) {
     ];
     let proc = spawn("bin/esptool", args);
     proc.stdout.pipe(process.stdout);
+    proc.stderr.pipe(process.stderr);
     proc.on('close', () => {
         process.exit(0);
-    })
+    });
+    proc.on('error', () => {
+        console.log("Error flashing espruino");
+    });
 } else {
     process.exit(0);
 }

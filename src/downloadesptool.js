@@ -5,7 +5,11 @@ import unzipper from 'unzipper';
 import path from 'path';
 
 export async function init(update) {
-    if (!fs.existsSync("bin")) fs.mkdir("bin");
+    console.log("[ ok ] bin folder exists");
+    if (!fs.existsSync("bin")) {
+        fs.mkdir("bin");
+    }
+    console.log("Getting platform dependent config...");
     let bin = "bin/esptool";
     let os = "";
     switch (process.platform) {
@@ -22,16 +26,20 @@ export async function init(update) {
             os = "linux";
             break;
     }
+    console.log(`[ ok ] platform: ${os}`);
     if (!update && fs.existsSync("bin/info.json") && fs.existsSync(bin)) {
+        console.log(`[ ok ] Found existing esptool binary at ${bin}`);
         return bin;
     } else {
         console.log("Updating esptool");
+        console.log("[ github ] get latest release at espressif/esptool");
         let json = await axios.get("https://api.github.com/repos/espressif/esptool/releases");
         let latest = json[0];
         let latest_asset = latest.assets.find(x => x.name.includes(os));
+        console.log("[ github ] latest release: " + latest.tag_name);
         let file = latest_asset.browser_download_url;
         let filename = latest_asset.name;
-        console.log("Downloading esptool...");
+        console.log("Downloading bundled zip from github...");
         let response = await axios({ url: file, responseType: 'arraybuffer' });
         let espzip = tmp.fileSync();
         fs.writeFileSync(espzip.name, response.data);
@@ -42,9 +50,9 @@ export async function init(update) {
                 .pipe(unzipper.Extract({ path: espzipdir.name }))
                 .on('finish', resolve);
         });
+        console.log("Copying binaries to bin folder...");
         fs.copyFileSync(path.resolve(espzipdir.name, path.parse(filename).name, "esptool"), path.resolve(process.cwd(), "bin/esptool"));
-        console.log("Downloaded");
-        console.log("Saving json manifest");
+        console.log("Esptool Updated");
         fs.writeFileSync("bin/info.json", JSON.stringify({
             version: latest.tag_name
         }));
