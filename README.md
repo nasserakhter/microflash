@@ -18,3 +18,46 @@ up to 2x baud rate faster on windows machines.
 Is it reliable?
 
 Since MicroFlash uses Esptool to flash the device, it is very reliable. Esptool is created by the same developers who created the ESP8266.
+
+## Getting started
+
+Start by cloning this repository, you can either:
+- Press the green code button on the top right to download the repository as a zip.
+- Use your local git client to clone the repository.
+- SSH into github and download it from there.
+
+The easiest is the first option. Simply download the zip and extract it.
+
+Next you need to make sure you have node.js installed. If not, you can download it from [here](https://nodejs.org/en/download/).
+
+Once completed, first time configuration for node.js is still required.
+
+Run the following command to download Facebook's package manager for node.js:
+```bash
+npm install -g yarn
+```
+or in some cases you might need sudo
+```bash
+sudo npm install -g yarn
+```
+
+Once that is complete you have node.js installed.
+
+Next, open a terminal (either command prompt, bash, zsh, etc.) and navigate to the directory where you cloned the repository.
+Make sure to navigate into the extracted directory.
+
+Next, run the following command to complete the install of MicroFlash:
+```bash
+yarn install
+```
+
+This command should upwards of 10 to 15 seconds to finish.
+After which you can simply start up MicroFlash by running the following command:
+
+```bash
+yarn start
+```
+ 
+This will, if not already installed, install Esptool and then prompt you for basic information like the serial port, baud rate, and espruino version.
+
+After that, MicroFlash will start flashing the device. And voila!
