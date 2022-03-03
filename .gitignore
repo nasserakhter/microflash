@@ -1,2 +1,4 @@
 /node_modules
+/bin
 yarn.lock
+config.json
