@@ -4,11 +4,11 @@ import fs from 'fs';
 import tmp from 'tmp';
 import path from 'path';
 
-export async function getLatestVersion() {
+export async function getLatestVersion(platformSelector) {
     console.log("[ espruino ] Get latest version from espruino.com...");
     let response = await axios(global.appConfig.espruino_binaries_apache_index);
     let document = new JSDOM(response.data).window.document;
-    let versions = [...document.querySelectorAll('a[href*="esp8266_4mb_combined_4096.bin"]')].map(a => a.textContent);
+    let versions = [...document.querySelectorAll(platformSelector)].map(a => a.textContent);
     versions = versions.sort((a, b) => a > b ? -1 : 1);
     let latest = versions[0];
     console.log("[ espruino ] Latest version: " + latest.split("_")[1]);

@@ -114,7 +114,20 @@ let baud = await inquirer.prompt([
 
 flashConfig.baudrate = parseInt(baud.rate);
 
-let versions = await getLatestVersion();
+let platformSelector = await inquirer.prompt([
+    {
+        type: "list",
+        name: "platform",
+        message: "Choose a platform",
+        choices: Object.values(global.appConfig.platforms).map(value => ({
+            name: value.name,
+            value: value
+        }))
+    }
+]);
+
+let versions = await getLatestVersion(platformSelector.platform.selector);
+
 let version = await inquirer.prompt([
     {
         type: "list",
@@ -137,7 +150,7 @@ flashConfig.version = selectedVersion;
 let confirmFlash = await inquirer.prompt({
     type: "confirm",
     name: "confirm",
-    message: `Are you sure you want to flash Espruino ${flashConfig.version.split("_")[1]} to ${flashConfig.port.path} at ${flashConfig.baudrate} baud?
+    message: `Are you sure you want to flash Espruino ${flashConfig.version.split("_")[1]} ${platformSelector.platform.name} to ${flashConfig.port.path} at ${flashConfig.baudrate} baud?
 This will erase all existing data on the device.`
 });
 
