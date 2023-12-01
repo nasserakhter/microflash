@@ -1,0 +1,14 @@
+{
+  "espruino_binaries_apache_index": "http://www.espruino.com/binaries/",
+  "esptool_github_releases_manifest": "https://api.github.com/repos/espressif/esptool/releases",
+  "platforms": {
+    "esp8266": {
+      "name": "ESP8266 / NodeMCU",
+      "selector": "a[href*=\"esp8266_4mb_combined_4096.bin\"]"
+    },
+    "esp32": {
+      "name": "ESP32",
+      "selector": "a[href*=\"esp32\"][href*=\".bin\"]"
+    }
+  }
+}
